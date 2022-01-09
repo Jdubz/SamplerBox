@@ -1,3 +1,4 @@
 samples/*
 **.c
 build/*
+server/__pycache__
