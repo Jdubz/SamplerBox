@@ -1,1 +1,3 @@
 samples/*
+**.c
+server/client_build/*
