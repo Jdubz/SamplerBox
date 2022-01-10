@@ -1,7 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 from flask import Flask
-import samplerbox
+
+import json
+
+with open("config.json") as json_data_file:
+    config = json.load(json_data_file)
 
 app = Flask(__name__, static_folder='../build', static_url_path='/')
 

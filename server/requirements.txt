@@ -55,6 +55,7 @@ python-debian===0.1.36ubuntu1
 PyYAML==5.3.1
 requests==2.22.0
 requests-unixsocket==0.2.0
+rtmidi==2.3.4
 SecretStorage==2.3.1
 service-identity==18.1.0
 simplejson==3.16.0
