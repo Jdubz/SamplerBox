@@ -1,4 +1,13 @@
 import numpy
+from audio import samplerbox_audio
+from samples import waveread
+import json
+
+with open("config.json") as json_data_file:
+    config = json.load(json_data_file)
+
+playingsounds = []
+globalvolume = 10 ** (-12.0/20)  # -12dB default global volume
 
 FADEOUTLENGTH = 30000
 FADEOUT = numpy.linspace(1., 0., FADEOUTLENGTH)            # by default, float64
@@ -60,7 +69,7 @@ class Sound:
 def AudioCallback(outdata, frame_count, time_info, status):
     global playingsounds
     rmlist = []
-    playingsounds = playingsounds[-MAX_POLYPHONY:]
+    playingsounds = playingsounds[-config.MAX_POLYPHONY:]
     b = samplerbox_audio.mixaudiobuffers(playingsounds, rmlist, frame_count, FADEOUT, FADEOUTLENGTH, SPEED)
     for e in rmlist:
         try:

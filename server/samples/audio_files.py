@@ -1,8 +1,6 @@
 import wave
 import struct
 from chunk import Chunk
-import threading
-import load
 
 class waveread(wave.Wave_read):
 

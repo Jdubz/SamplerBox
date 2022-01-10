@@ -1,5 +1,8 @@
 from distutils.core import setup
 from Cython.Build import cythonize
-import numpy
 
-setup(ext_modules = cythonize("samplerbox_audio.pyx"), include_dirs=[numpy.get_include()])
+setup(
+    name='server',
+    packages=['server'],
+    ext_modules = cythonize("./audio/samplerbox_audio.pyx"),
+)

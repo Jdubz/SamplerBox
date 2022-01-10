@@ -1,4 +1,4 @@
-import rtmidi_python as rtmidi
+import rtmidi
 import callbacks
 import time
 import threading

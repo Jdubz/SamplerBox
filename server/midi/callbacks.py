@@ -1,10 +1,10 @@
 
+from samples import LoadSamples
+
 samples = {}
 playingnotes = {}
 sustainplayingnotes = []
 sustain = False
-playingsounds = []
-globalvolume = 10 ** (-12.0/20)  # -12dB default global volume
 globaltranspose = 0
 
 def MidiCallback(message, time_stamp):

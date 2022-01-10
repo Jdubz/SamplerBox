@@ -1,6 +1,7 @@
 import os
 import threading
 from audio import Sound
+import re
 import json
 
 with open("config.json") as json_data_file:
@@ -62,7 +63,7 @@ def ActuallyLoad():
                     pattern = pattern.split(',')[0]
                     pattern = re.escape(pattern.strip())
                     pattern = pattern.replace(r"\%midinote", r"(?P<midinote>\d+)").replace(r"\%velocity", r"(?P<velocity>\d+)")\
-                                     .replace(r"\%notename", r"(?P<notename>[A-Ga-g]#?[0-9])").replace(r"\*", r".*?").strip()    # .*? => non greedy
+                        .replace(r"\%notename", r"(?P<notename>[A-Ga-g]#?[0-9])").replace(r"\*", r".*?").strip()    # .*? => non greedy
                     for fname in os.listdir(dirname):
                         if LoadingInterrupt:
                             return

@@ -1,5 +1,6 @@
 samples/*
-**.c
 build/*
-server/__pycache__
+**/__pycache__
 server/config.json
+server/build
+**.c*
