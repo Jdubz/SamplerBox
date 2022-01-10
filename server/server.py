@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 from flask import Flask
-# import audio
-# import samples
+import audio
+import samples
 import midi
 
 app = Flask(__name__, static_folder='../build', static_url_path='/')
