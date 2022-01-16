@@ -22,7 +22,12 @@ from chunk import Chunk
 import struct
 import rtmidi_python as rtmidi
 import samplerbox_audio
+import json
 
+with open("config.json") as json_data_file:
+    config = json.load(json_data_file)
+
+from midiHandler import Midi
 
 #########################################
 # SLIGHT MODIFICATION OF PYTHON'S WAVE MODULE
@@ -153,7 +158,6 @@ playingsounds = []
 globalvolume = 10 ** (-12.0/20)  # -12dB default global volume
 globaltranspose = 0
 
-
 #########################################
 # AUDIO AND MIDI CALLBACKS
 #
@@ -172,50 +176,6 @@ def AudioCallback(outdata, frame_count, time_info, status):
     b *= globalvolume
     outdata[:] = b.reshape(outdata.shape)
 
-def MidiCallback(message, time_stamp):
-    global playingnotes, sustain, sustainplayingnotes
-    global preset
-    messagetype = message[0] >> 4
-    messagechannel = (message[0] & 15) + 1
-    note = message[1] if len(message) > 1 else None
-    midinote = note
-    velocity = message[2] if len(message) > 2 else None
-
-    if messagetype == 9 and velocity == 0:
-        messagetype = 8
-
-    if messagetype == 9:    # Note on
-        midinote += globaltranspose
-        try:
-            playingnotes.setdefault(midinote, []).append(samples[midinote, velocity].play(midinote))
-        except:
-            pass
-
-    elif messagetype == 8:  # Note off
-        midinote += globaltranspose
-        if midinote in playingnotes:
-            for n in playingnotes[midinote]:
-                if sustain:
-                    sustainplayingnotes.append(n)
-                else:
-                    n.fadeout(50)
-            playingnotes[midinote] = []
-
-    elif messagetype == 12:  # Program change
-        print('Program change ' + str(note))
-        preset = note
-        LoadSamples()
-
-    elif (messagetype == 11) and (note == 64) and (velocity < 64):  # sustain pedal off
-        for n in sustainplayingnotes:
-            n.fadeout(50)
-        sustainplayingnotes = []
-        sustain = False
-
-    elif (messagetype == 11) and (note == 64) and (velocity >= 64):  # sustain pedal on
-        sustain = True
-
-
 #########################################
 # LOAD SAMPLES
 #
@@ -223,7 +183,6 @@ def MidiCallback(message, time_stamp):
 
 LoadingThread = None
 LoadingInterrupt = False
-
 
 def LoadSamples():
     global LoadingThread
@@ -340,6 +299,16 @@ except:
     exit(1)
 
 #########################################
+# LOAD FIRST SOUNDBANK
+#
+#########################################
+
+preset = 0
+LoadSamples()
+
+midi = Midi(config, samples, globaltranspose, preset, LoadSamples)
+
+#########################################
 # MIDI IN via SERIAL PORT
 #
 #########################################
@@ -362,7 +331,7 @@ if USE_SERIALPORT_MIDI:
                 if i == 2 and message[0] >> 4 == 12:  # program change: don't wait for a third byte: it has only 2 bytes
                     message[2] = 0
                     i = 3
-            MidiCallback(message, None)
+            midi.midiCallback(message, None)
 
     MidiThread = threading.Thread(target=MidiSerialCallback)
     MidiThread.daemon = True
@@ -370,18 +339,10 @@ if USE_SERIALPORT_MIDI:
 
 
 #########################################
-# LOAD FIRST SOUNDBANK
-#
-#########################################
-
-preset = 0
-LoadSamples()
-
-
-#########################################
 # MIDI DEVICES DETECTION
 # MAIN LOOP
 #########################################
+
 
 midi_in = [rtmidi.MidiIn(b'in')]
 previous = []
@@ -389,7 +350,7 @@ while True:
     for port in midi_in[0].ports:
         if port not in previous and b'Midi Through' not in port:
             midi_in.append(rtmidi.MidiIn(b'in'))
-            midi_in[-1].callback = MidiCallback
+            midi_in[-1].callback = midi.midiCallback
             midi_in[-1].open_port(port)
             print(b'Opened MIDI: ' + port)
     previous = midi_in[0].ports
