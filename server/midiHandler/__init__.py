@@ -6,7 +6,7 @@ class Midi:
     def __init__(self, config, samples, globaltranspose, preset, loadSamples):
         self.config = config
         self.playingnotes = {}
-        self.sustain = True
+        self.sustain = False
         self.sustainplayingnotes = []
         self.samples = samples
         self.globaltranspose = globaltranspose

@@ -1,11 +1,3 @@
-AUDIO_DEVICE_ID = 2                     # change this number to use another soundcard
-SAMPLES_DIR = "./samples"                       # The root directory containing the sample-sets. Example: "/media/" to look for samples on a USB stick / SD card
-USE_SERIALPORT_MIDI = False             # Set to True to enable MIDI IN via SerialPort (e.g. RaspberryPi's GPIO UART pins)
-USE_I2C_7SEGMENTDISPLAY = False         # Set to True to use a 7-segment display via I2C
-USE_BUTTONS = False                     # Set to True to use momentary buttons (connected to RaspberryPi's GPIO pins) to change preset
-MAX_POLYPHONY = 80                      # This can be set higher, but 80 is a safe value
-
-
 #########################################
 # IMPORT
 # MODULES
@@ -166,7 +158,7 @@ globaltranspose = 0
 def AudioCallback(outdata, frame_count, time_info, status):
     global playingsounds
     rmlist = []
-    playingsounds = playingsounds[-MAX_POLYPHONY:]
+    playingsounds = playingsounds[-config["MAX_POLYPHONY"]:]
     b = samplerbox_audio.mixaudiobuffers(playingsounds, rmlist, frame_count, FADEOUT, FADEOUTLENGTH, SPEED)
     for e in rmlist:
         try:
@@ -211,7 +203,7 @@ def ActuallyLoad():
     globalvolume = 10 ** (-12.0/20)  # -12dB default global volume
     globaltranspose = 0
 
-    samplesdir = SAMPLES_DIR if os.listdir(SAMPLES_DIR) else '.'      # use current folder (containing 0 Saw) if no user media containing samples has been found
+    samplesdir = config["SAMPLES_DIR"] if os.listdir(config["SAMPLES_DIR"]) else '.'      # use current folder (containing 0 Saw) if no user media containing samples has been found
 
     basename = next((f for f in os.listdir(samplesdir) if f.startswith("%d " % preset)), None)      # or next(glob.iglob("blah*"), None)
     if basename:
@@ -290,12 +282,14 @@ def ActuallyLoad():
 #
 #########################################
 
+device = config["AUDIO_DEVICE_ID"]
+
 try:
-    sd = sounddevice.OutputStream(device=AUDIO_DEVICE_ID, blocksize=512, samplerate=44100, channels=2, dtype='int16', callback=AudioCallback)
+    sd = sounddevice.OutputStream(device=device, blocksize=512, samplerate=44100, channels=2, dtype='int16', callback=AudioCallback)
     sd.start()
-    print('Opened audio device #%i' % AUDIO_DEVICE_ID)
+    print('Opened audio device #%i' % device)
 except:
-    print('Invalid audio device #%i' % AUDIO_DEVICE_ID)
+    print('Invalid audio device #%i' % device)
     exit(1)
 
 #########################################
@@ -313,7 +307,7 @@ midi = Midi(config, samples, globaltranspose, preset, LoadSamples)
 #
 #########################################
 
-if USE_SERIALPORT_MIDI:
+if config["USE_SERIALPORT_MIDI"]:
     import serial
 
     ser = serial.Serial('/dev/ttyAMA0', baudrate=38400)       # see hack in /boot/cmline.txt : 38400 is 31250 baud for MIDI!
