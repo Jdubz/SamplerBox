@@ -1,0 +1,23 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "sample player",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "nodemon src/index.js",
+    "start-dev": "nodemon --watch src src/index.js",
+    "test": "test"
+  },
+  "keywords": [
+    "sampler"
+  ],
+  "author": "josh wentworth",
+  "license": "CC-BY-4.0",
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.2"
+  }
+}

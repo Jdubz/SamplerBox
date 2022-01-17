@@ -21,17 +21,8 @@ const Devices = () => {
 
     return <Container>
         <ul>
-            {devices.map((device, i) =>
-                <li key={device.name}>
-                    <h3>{i}. {device.name}</h3>
-                    <table>
-                    {Object.entries(device).map(([key, value]) => {
-                        if (key !== 'name') {
-                            return <tr><td>{key}</td><td>{value}</td></tr>
-                        }
-                    })}
-                    </table>
-                </li>
+            {devices.map((device) =>
+                <li key={device}>{device}</li>
             )}
         </ul>
     </Container>;

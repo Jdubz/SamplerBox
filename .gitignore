@@ -1,7 +1,4 @@
 samples/*
 build/*
-**/__pycache__
-server/config.json
-server/build
-server/venv/
-**.c*
+client/node_modules
+server/node_modules
